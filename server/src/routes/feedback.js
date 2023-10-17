@@ -23,6 +23,11 @@ router.post(
   updateRatingForJob
 );
 
+//cập nhật feedback
+router.patch("/update-feedback/:userId/:feedbackId", updateFeedback)
+//xoá feedback
+router.delete("/delete-feedback/:userId/:feedbackId", deleteFeedback)
+
 router.param("feedbackId", feedbackById);
 router.param("userId", userById);
 router.param("employerId", employerById);

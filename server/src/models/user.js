@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema(
     permission: {
       type: String,
       default: "user",
-      enum: ["user", "admin"],
+      enum: ["user", "admin", "candidate"],
     },
     facebookId: {
       type: String,

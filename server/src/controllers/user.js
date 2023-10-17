@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const Job = require("../models/job");
 const asyncHandler = require("express-async-handler");
 const mongoose = require("mongoose");
 
@@ -137,6 +138,66 @@ const getListUserForAdmin = asyncHandler(async (req, res) => {
   });
 });
 
+const saveWishlist = asyncHandler(async (req, res) => {
+  const userId = req.params.userId;
+  const jobId = req.params.jobId;
+  const user = await User.findById(userId);
+  if (user.wishlistIds.includes(jobId)) {
+    return res
+            .status(400)
+            .json({ 
+              success: false, 
+              message: 'The job already exists in the favorites list.' 
+            });
+  }else{
+  user.wishlistIds.push(jobId);
+  await user.save();
+  return res
+          .status(200)
+          .json({ 
+            success: true, 
+            message: 'The job has been added to your favorites list.' 
+          });
+  }
+});
+
+const getWishlist = asyncHandler(async (req, res) => {
+  const userId = req.params.userId;
+  const user = await User.findById(userId);
+  const jobIds = user.wishlistIds;
+  const jobs = await Job.find({ _id: { $in: jobIds } });
+  return res
+          .status(200)
+          .json({ 
+            success: true, 
+            message: 'wishlist.', 
+            data: jobs 
+          });
+});
+
+const DeleteWishlist = asyncHandler(async (req, res) => {
+  const userId = req.params.userId;
+  const jobId = req.params.jobId;
+  const user = await User.findById(userId);
+  const index = user.wishlistIds.indexOf(jobId);
+  if (index === -1) {
+    return res
+              .status(400)
+              .json({
+                success: false, 
+                message: 'The job does not exist in the wish list.' 
+              });
+  }
+  user.wishlistIds.splice(index, 1);
+  await user.save();
+  return res
+            .status(200)
+            .json({ 
+              success: true, 
+              message: 'The job has been removed from the wish list.' 
+            });
+});
+
 module.exports = {
   userById,
   getUserDetail,
@@ -145,4 +206,7 @@ module.exports = {
   replacePassword,
   followCompany,
   getListUserForAdmin,
+  saveWishlist,
+  getWishlist,
+  DeleteWishlist
 };
